@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Console\Commands\System;
+
+use App\CPUStatistics;
+use App\Utils\System\CPU;
+use Illuminate\Console\Command;
+
+class CalculateCPUUsage extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'system:cpu:calc-usage';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Calculate CPU usage';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $records = CPUStatistics::query()->orderByDesc("id")->limit(2)->get()->toArray();
+        if (count($records) !== 2) {
+            $this->error("Lack of statistics record");
+            return 1;
+        }
+
+        $this->info($records[1]["microtime"] . " - " . $records[0]["microtime"]);
+        print_r(CPU::calculateUsage(json_decode($records[1]["data"], true), json_decode($records[0]["data"], true)));
+        return 0;
+    }
+}

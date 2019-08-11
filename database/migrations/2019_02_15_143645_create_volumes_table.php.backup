@@ -1,0 +1,55 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateVolumesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('volumes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('pool_id');
+            $table->string('unique_id')->unique();
+            $table->string('type');
+            $table->string('format');
+            $table->unsignedInteger('capacity')->nullable();
+            $table->string('backing_store_format')->nullable();
+            $table->string('backing_store_path')->nullable();
+            $table->unsignedInteger('attached_compute_instance_id')->nullable();
+            $table->unsignedTinyInteger('attach_order')->default(255);
+            $table->string('bus')->nullable();
+            $table->timestamps();
+
+            $table->foreign('pool_id')
+                ->references('id')
+                ->on('pools')
+                ->onDelete('cascade')
+                ->onUpdate('cascade')
+            ;
+
+            $table->foreign('attached_compute_instance_id')
+                ->references('id')
+                ->on('compute_instances')
+                ->onDelete('cascade')
+                ->onUpdate('cascade')
+            ;
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('volumes');
+    }
+}

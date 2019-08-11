@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Console\Commands\System;
+
+use App\NetworkStatistics;
+use App\Utils\System\Network;
+use Illuminate\Console\Command;
+
+class CalculateNetworkUsage extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'system:network:calc-usage';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Calculate network usage';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $records = NetworkStatistics::query()->orderByDesc("id")->limit(2)->get()->toArray();
+        if (count($records) !== 2) {
+            $this->error("Lack of statistics record");
+            return 1;
+        }
+
+        $this->info($records[1]["microtime"] . " - " . $records[0]["microtime"]);
+        $timeDiffInSecond = $records[0]["microtime"] - $records[1]["microtime"];
+        print_r(Network::calculateUsage(json_decode($records[1]["data"], true), json_decode($records[0]["data"], true), $timeDiffInSecond));
+        return 0;
+    }
+}
