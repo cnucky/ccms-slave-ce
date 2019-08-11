@@ -184,7 +184,7 @@ if [ -d "${directoryName}" ];then
     pushd ${directoryName}
     RUN git pull
 else
-    RUN git clone https://github.com/yzsme/ccms-slave.git ${directoryName}
+    RUN git clone https://github.com/yzsme/ccms-slave-ce.git ${directoryName}
     pushd ${directoryName}
 fi
 
